@@ -1,0 +1,16 @@
+R1: resistencia para el segmento del display de 7 segmentos conectado al pin 8
+R2: resistencia para el segmento del display de 7 segmentos conectado al pin 9
+R3: resistencia para el segmento del display de 7 segmentos conectado al pin 10
+R4: resistencia para el segmento del display de 7 segmentos conectado al pin 11
+R5: resistencia para el segmento del display de 7 segmentos conectado al pin A0
+R6: resistencia para el segmento del display de 7 segmentos conectado al pin A1
+R7: resistencia para el segmento del display de 7 segmentos conectado al pin A2
+R8: resistencia para el LED ROJO del pin 5
+R9: resistencia para el LED VERDE del pin 6
+R10: resistencia para el PULSADOR 2
+S1: pulsador conectado en modo input pullup a 5v y a pin 3 que permite hacer ascender el montacargas cuando su estado sea 0
+S2: pulsador conectado en modo pulldown a 5v, gnd y a pin 2 que permite pausar el montacargas cuando su estado sea 1
+S3: pulsador conectado en modo input pullup a 5v y a pin 4 que permite hacer descender el montacargas cuando su estado sea 0
+D1: led rojo conectado al pin 5 que se prende cuando su estado sea 1
+D2: led verde conectado al pin 6 que se prende cuando su estado sea 1
+DIGIT1: display de 7 segmentos conectado en los pines 8, 9, 10, 11, 12, A0, A1 y A2, conectado en modo catodo para que cuando su estado sea 1 se enciendan los segmentos correspondientes

@@ -1,0 +1,291 @@
+/* 
+---------------PRIMER PARCIAL SPD------------------------
+
+Se nos pide armar un modelo de montacarga funcional como maqueta para un hospital. El
+objetivo es que implementes un sistema que pueda recibir ordenes de subir, bajar o pausar
+desde diferentes pisos y muestre el estado actual del montacargas en el display 7
+segmentos.
+---------------------------------------------------------
+
+*/
+
+#define botonPausa 2
+#define botonArriba 3
+#define botonAbajo 4
+#define rojo 5
+#define verde 6
+#define G 8
+#define F 9
+#define A 10
+#define B 11
+#define E A0
+#define D A1
+#define C A2
+
+int estadoPausa;
+int estadoArriba;
+int estadoAbajo;
+int pulsador;
+int piso = 0;
+int comprobacion = 0;
+
+void pausar();
+void apagarTodos();
+void comprobarBoton(int boton);
+void numeroDisplay(int numero);
+void prenderApagar(int pin_uno, int pin_dos);
+void leerBotones(int boton_uno, int boton_dos);
+void estados(int estado_uno, int estado_dos, int estado_tres);
+int bajarM(int piso);
+int subirM(int piso);
+int limites(int piso);
+
+void setup()
+{
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(E, OUTPUT);
+  pinMode(F, OUTPUT);
+  pinMode(G, OUTPUT);
+  pinMode(rojo, OUTPUT);
+  pinMode(verde, OUTPUT);
+  pinMode(botonPausa, INPUT);
+  pinMode(botonArriba, INPUT_PULLUP);
+  pinMode(botonAbajo, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(2),pausar,RISING);
+  
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  leerBotones(botonArriba, botonAbajo);
+  estados(estadoArriba, estadoAbajo, estadoPausa); 
+}
+
+
+
+void leerBotones(int boton_uno, int boton_dos)
+{
+  estadoArriba = digitalRead(boton_uno);
+  estadoAbajo = digitalRead(boton_dos);
+}
+
+
+void numeroDisplay(int numero)
+{
+  apagarTodos();
+  Serial.print("piso:");
+  Serial.println(numero);
+  
+  switch(numero)
+  {
+  case 0:  
+  digitalWrite(A, HIGH);
+  digitalWrite(B, HIGH);
+  digitalWrite(C, HIGH);
+  digitalWrite(D, HIGH);
+  digitalWrite(E, HIGH);
+  digitalWrite(F, HIGH);
+  case 1:
+  digitalWrite(B, HIGH);
+  digitalWrite(C, HIGH);
+  break;
+  case 2:
+  digitalWrite(A, HIGH);
+  digitalWrite(B, HIGH);
+  digitalWrite(D, HIGH);
+  digitalWrite(E, HIGH);
+  digitalWrite(G, HIGH);
+  break;
+  case 3:
+  digitalWrite(A, HIGH);
+  digitalWrite(B, HIGH);
+  digitalWrite(C, HIGH);
+  digitalWrite(D, HIGH);
+  digitalWrite(G, HIGH);
+  break;
+  case 4:
+  digitalWrite(B, HIGH);
+  digitalWrite(C, HIGH);
+  digitalWrite(F, HIGH);
+  digitalWrite(G, HIGH);
+  break;
+  case 5:
+  digitalWrite(A, HIGH);
+  digitalWrite(C, HIGH);
+  digitalWrite(D, HIGH);
+  digitalWrite(F, HIGH);
+  digitalWrite(G, HIGH);
+  break;
+  case 6:
+  digitalWrite(A, HIGH);
+  digitalWrite(C, HIGH);
+  digitalWrite(D, HIGH);
+  digitalWrite(E, HIGH);
+  digitalWrite(F, HIGH);
+  digitalWrite(G, HIGH);
+  break;
+  case 7:
+  digitalWrite(A, HIGH);
+  digitalWrite(B, HIGH);
+  digitalWrite(C, HIGH);
+  break;
+  case 8:
+  digitalWrite(A, HIGH);
+  digitalWrite(B, HIGH);
+  digitalWrite(C, HIGH);
+  digitalWrite(D, HIGH);
+  digitalWrite(E, HIGH);
+  digitalWrite(F, HIGH);
+  digitalWrite(G, HIGH);
+  break;
+  case 9:
+  digitalWrite(A, HIGH);
+  digitalWrite(B, HIGH);
+  digitalWrite(C, HIGH);
+  digitalWrite(D, HIGH);
+  digitalWrite(F, HIGH);
+  digitalWrite(G, HIGH);
+  break;
+  }
+  
+}
+
+
+int subirM(int piso)
+{
+  Serial.println("subiendo..");
+  
+  for(; piso < 10; piso++)
+  {
+    numeroDisplay(piso);
+    comprobarBoton(botonAbajo);
+    
+     if(comprobacion == 1 || estadoPausa == 1)
+     {
+       break;
+     }
+   }
+   
+  piso = limites(piso);
+  comprobacion = 0;
+  return piso;
+}
+
+
+int bajarM(int piso)
+{
+  Serial.println("bajando..");
+  
+  for(; piso >= 0; piso--)
+  {
+    numeroDisplay(piso);
+    comprobarBoton(botonArriba);
+    
+    if(comprobacion == 1 || estadoPausa == 1)
+    {
+      break;
+    }
+    
+  }
+  
+  piso = limites(piso);
+  comprobacion = 0;
+  return piso;
+}
+
+
+void apagarTodos()
+{
+  digitalWrite(A, LOW);
+  digitalWrite(B, LOW);
+  digitalWrite(C, LOW);
+  digitalWrite(D, LOW);
+  digitalWrite(E, LOW);
+  digitalWrite(F, LOW);
+  digitalWrite(G, LOW);
+}
+
+
+void comprobarBoton(int boton)
+{
+  
+  for(int i = 0; i < 24; i++)
+  {
+     delay(125);
+     int estado = digitalRead(boton);
+     
+    if(estado == LOW)
+    {
+      comprobacion = 1;
+       break;
+    }
+    
+  }
+}
+
+
+void pausar()
+{
+  
+   estadoPausa = digitalRead(2);
+  
+  if(estadoPausa == HIGH)
+  {
+    estadoPausa = 1;
+  }
+}
+
+
+int limites(int piso)
+{
+  if(piso == 10)
+   {
+    piso--;
+    prenderApagar(rojo, verde);
+    Serial.println("ultimo piso, no se puede subir mas");
+   }
+  
+  if(piso == -1)
+    {
+       piso++;
+      prenderApagar(rojo, verde);
+      Serial.println("primer piso, no se puede bajar mas");
+    }
+  
+  return piso;
+}
+
+
+void prenderApagar(int pin_uno, int pin_dos)
+{
+  digitalWrite(pin_uno, HIGH);
+  digitalWrite(pin_dos, LOW);
+}
+
+
+void estados(int estado_uno, int estado_dos, int estado_tres)
+{
+  if(estado_uno == LOW)
+  {
+   prenderApagar(verde, rojo);
+   piso = subirM(piso); 
+  }
+  
+  if(estado_dos == LOW)
+  { 
+    prenderApagar(verde, rojo);
+    piso = bajarM(piso); 
+  }
+  
+  if(estado_tres == HIGH)
+  {
+    prenderApagar(rojo, verde);
+    Serial.println("montacargas pausado");
+    estadoPausa = 0;
+  }
+  
+}
