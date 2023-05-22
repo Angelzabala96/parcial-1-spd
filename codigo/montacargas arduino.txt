@@ -22,11 +22,17 @@ segmentos.
 #define D A1
 #define C A2
 
+//variable para saber cuando es presionado el boton de pausa
 int estadoPausa;
+//variable para saber cuando es presionado el boton de subir
 int estadoArriba;
+//variable para saber cuando es presionado el boton de bajar
 int estadoAbajo;
+//variable que nos indica cuando es presionado el boton de pausa en cualquier momento
 int pulsador;
+//variable utilizada como contador para saber en que piso estamos
 int piso = 0;
+//variable para saber si fue presionado un boton que no sea el que esta ejecutando la accion en este momento
 int comprobacion = 0;
 
 void pausar();
@@ -54,6 +60,7 @@ void setup()
   pinMode(botonPausa, INPUT);
   pinMode(botonArriba, INPUT_PULLUP);
   pinMode(botonAbajo, INPUT_PULLUP);
+  //funcion para saber en cualquier momento si es presionado el boton de pausa
   attachInterrupt(digitalPinToInterrupt(2),pausar,RISING);
   
   Serial.begin(9600);
@@ -61,7 +68,10 @@ void setup()
 
 void loop()
 {
+//funcion para leer los botones
   leerBotones(botonArriba, botonAbajo);
+
+//funcion para saber que boton es presionado
   estados(estadoArriba, estadoAbajo, estadoPausa); 
 }
 
@@ -69,11 +79,12 @@ void loop()
 
 void leerBotones(int boton_uno, int boton_dos)
 {
+//lee  los botones y los guarda en la variable
   estadoArriba = digitalRead(boton_uno);
   estadoAbajo = digitalRead(boton_dos);
 }
 
-
+//forma los numeros en el display segun el piso en el que se este, tambien los imprime en el serial
 void numeroDisplay(int numero)
 {
   apagarTodos();
@@ -154,7 +165,7 @@ void numeroDisplay(int numero)
   
 }
 
-
+//funcion para subir los pisos
 int subirM(int piso)
 {
   Serial.println("subiendo..");
@@ -197,7 +208,7 @@ int bajarM(int piso)
   return piso;
 }
 
-
+//apaga los leds del display de 7 segmentos
 void apagarTodos()
 {
   digitalWrite(A, LOW);
@@ -209,6 +220,8 @@ void apagarTodos()
   digitalWrite(G, LOW);
 }
 
+//comprueba si el boton de subir o bajar fue presionado cuando esta tomando la accion contraria, esto tambien delimita el
+//tiempo de ejecucion de los numeros
 
 void comprobarBoton(int boton)
 {
@@ -227,7 +240,7 @@ void comprobarBoton(int boton)
   }
 }
 
-
+//identifica si el boton de pausar el sistema fue presionado
 void pausar()
 {
   
@@ -239,7 +252,7 @@ void pausar()
   }
 }
 
-
+//comprueba se haya llegado al piso maximo o minimo
 int limites(int piso)
 {
   if(piso == 10)
@@ -259,14 +272,14 @@ int limites(int piso)
   return piso;
 }
 
-
+//prende un led y apaga el otro
 void prenderApagar(int pin_uno, int pin_dos)
 {
   digitalWrite(pin_uno, HIGH);
   digitalWrite(pin_dos, LOW);
 }
 
-
+//funcion para saber que boton es presionado
 void estados(int estado_uno, int estado_dos, int estado_tres)
 {
   if(estado_uno == LOW)
